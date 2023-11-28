@@ -1,17 +1,23 @@
 var jwt = require('jsonwebtoken');
-const fetchuser = (req,res,next)=>{
+const fetchuser = async (req,res,next)=>{
     const JWT_SECRET="super";
-    const token = req.header('auth-token');
-    if(!token){
-        res.status(401).json({error:"Pls authenticate using a valid token"});
+    console.log(req.cookies.auth)
+    console.log(req.user)
+    if(req.cookies.auth===undefined){
+        
+        res.status(401).json({error:"Pls authenticate using a valid token 1"});
     }
+    const token = req.cookies.auth;
 
     try {
-        let data = jwt.verify(token,JWT_SECRET);
+        let data =   jwt.verify(token,JWT_SECRET);
+       // console.log(data)
         req.user = data.user;
+        
         next();
     } catch (error) {
-        res.status(401).json({error:"Pls authenticate using a valid token"});
+      
+        res.status(401).json({error:"Pls authenticate using a valid token 2"});
     }
 
 }

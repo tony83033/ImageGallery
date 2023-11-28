@@ -44,12 +44,14 @@ router.post('/sign',
         const data = {
             user: {
                 id: newUser.id,
+                name: newUser.name,
                 email: newUser.email
             }
 
         }
         const authToken = jwt.sign(data, "super");
-        return res.status(200).json({ authtoken: authToken, success: true });
+        res.cookie('auth',authToken);
+        return res.status(200).redirect('/');
 
     });
 
@@ -82,11 +84,13 @@ router.post('/login', [
             const data = {
                 user: {
                     id: user.id,
-                    email: user.email
+                    email: user.email,
+                    name: user.name
                 }
             }
             const auhtoken = jwt.sign(data,"super");
-            return res.status(200).json({authtoken:auhtoken,success:true})
+            res.cookie('auth',auhtoken);
+        return res.status(200).redirect('/');
         }else{
             return res.status(200).json({ message: "Invalid Credentials", success: false })
         }
@@ -98,11 +102,20 @@ router.post('/login', [
 
 
 });
+router.get('/logout', (req, res) => {
+    // Clear the cookie named 'auth'
+    res.clearCookie('auth');
+    
+    // Redirect or send response as needed
+    res.redirect('/'); // For example, redirect to the login page after logout
+  });
+  
 
 router.post('/getuser', fetchuser, async (req,res)=>{
     try {
        const userId = req.user.id;
-       const user  = await User.findById(userId).select("-password");
+       const user  = await Users.findById(userId).select("-password");
+       ;
        res.status(200).json(user);
 
     } catch (error) {
